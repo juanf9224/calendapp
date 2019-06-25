@@ -35,6 +35,10 @@ export const selectCurrentCalendarId = createSelector(
   selectCalendarFeature,
   fromCalendar.getSelectedCalendarId
 );
+export const selectAllCalendarDates = createSelector(
+  selectCalendarFeature,
+  fromCalendar.getAllCalendarDates
+);
 
 export const selectCurrentCalendar = createSelector(
   selectCalendarEntities,

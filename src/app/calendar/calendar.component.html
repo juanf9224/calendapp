@@ -10,21 +10,19 @@
       {{day}}
     </div>
     <div class="weeks">
-      <div *ngIf="calendar$ | async as cal">
-<!--          <div *ngFor="let week of weeks" class="week">-->
-<!--            <ng-container *ngFor="let day of cal.entities['0'].dates">-->
-<!--              <div class="calendar-date cols-7">-->
-<!--                <div class="row">-->
-<!--                  <div class="calendar-day">{{day.date.date()}}</div>-->
-<!--                </div>-->
-<!--                <div class="row">-->
-<!--                  <div class="reminder-badge">-->
-<!--                    <mat-icon>alarm</mat-icon>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </ng-container>-->
-<!--          </div>-->
+      <div *ngIf="calendar">
+          <ng-container *ngFor="let day of calendar">
+            <div class="calendar-date cols-7">
+              <div class="row">
+                <div class="calendar-day">{{day.date.date()}}</div>
+              </div>
+              <div class="row">
+                <div class="reminder-badge">
+                  <mat-icon>alarm</mat-icon>
+                </div>
+              </div>
+            </div>
+          </ng-container>
       </div>
     </div>
   </div>

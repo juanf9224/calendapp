@@ -18,9 +18,9 @@ const calendarDateReducer = createReducer(
   on(CalendarActions.renderCalendar, (state, { dates }  ) => {
     return adapter.addMany(dates , state);
   }),
-  // on(CalendarActions.addReminderToCalendar, (state: CalendarState, calendarDate: CalendarDate) => {
-  //   return adapter.updateOne({id: calendarDate.id, changes: calendarDate}, state);
-  // })
+  on(CalendarActions.addReminderToCalendar, (state: CalendarState, calendarDate: CalendarDate) => {
+    return adapter.updateOne({id: calendarDate.id, changes: calendarDate}, state);
+  })
 );
 
 export function reducer(state: CalendarState | undefined, action: Action) {
@@ -28,6 +28,12 @@ export function reducer(state: CalendarState | undefined, action: Action) {
 }
 
 export const getSelectedCalendarId = (state: CalendarState) => state.selectCalendarId;
+
+export const getAllCalendarDates = (state: CalendarState) => {
+  const calendarDates = [];
+  state.ids.forEach((i) => calendarDates.push(state.entities[i.toString]));
+  return calendarDates;
+};
 
 const {
   selectIds,

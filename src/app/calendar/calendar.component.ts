@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import * as _ from 'lodash';
 import {select, Store} from '@ngrx/store';
-import {Observable} from 'rxjs';
 
 import {CalendarDate} from '../shared/model/calendar-date.model';
 import * as fromCalendar from '../store/reducers/calendar.reducer';
@@ -16,15 +15,21 @@ import * as calendarActions from '../store/actions/calendar.actions';
 export class CalendarComponent implements OnInit {
   currentDate = moment();
   days = moment.weekdays();
-  calendar$: Observable<CalendarDate[]>;
+  calendar: CalendarDate[] = [];
   constructor(
     private store: Store<fromCalendar.CalendarState>
   ) { }
 
-  async ngOnInit() {
-    this.calendar$ = await this.store.pipe(select('selectCurrentCalendarId'));
-    this.calendar$.subscribe(c => console.log(c));
-    this.generateCalendar();
+  ngOnInit() {
+    this.store.pipe(select('calendar')).subscribe((c: fromCalendar.CalendarState) => {
+      console.log(c);
+      if (c.ids.length > 0 && c) {
+        c.ids.forEach( i => this.calendar.push(c.entities[i.toString()]));
+      } else {
+        this.generateCalendar();
+      }
+      console.log('calendar: ', this.calendar);
+    });
   }
 
   generateCalendar() {
