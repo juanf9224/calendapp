@@ -1,0 +1,31 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-6 float-md-right"></div>
+    <div class="col-md-6 float-md-right">
+      <button mat-raised-button class="float-md-right">Add Reminder</button>
+    </div>
+  </div>
+  <div class="row month-grid">
+    <div *ngFor="let day of days" class="cols-7">
+      {{day}}
+    </div>
+    <div class="weeks">
+      <div *ngIf="calendar$ | async as cal">
+          <div *ngFor="let week of cal.entities['0'].view" class="week">
+            <ng-container *ngFor="let day of week">
+              <div class="calendar-date">
+                <div class="row">
+                  <div class="calendar-day">{{day.date.date()}}</div>
+                </div>
+                <div class="row">
+                  <div class="reminder-badge">
+                    <mat-icon>alarm</mat-icon>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

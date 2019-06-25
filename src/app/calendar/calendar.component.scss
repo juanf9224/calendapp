@@ -1,0 +1,36 @@
+.cols-7 {
+  position: relative;
+  width: calc(100%/7);
+  min-height: 1px;
+  padding-left: 15px;
+  padding-right: 15px;
+  text-align: center;
+}
+
+.month-grid {
+  .weeks {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .week {
+    display: flex;
+    flex-direction: row;
+  }
+  .week-days {
+
+  }
+}
+
+.calendar-date {
+  padding-left: 15px;
+  padding-right: 15px;
+  width: 100%;
+  height: 100px;
+  display: block;
+  border: 1px solid #333;
+
+  .calendar-day {
+    font-size: 0.5em;
+  }
+}
