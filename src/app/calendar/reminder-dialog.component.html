@@ -29,11 +29,13 @@
      </mat-autocomplete>
    </mat-form-field>
    <mat-form-field>
-     <mat-label>City</mat-label>
-     <input
-       name="city"
-       matInput [(ngModel)]="data.city" />
-   </mat-form-field>
+    <input type="text" placeholder="Pick one" aria-label="Number" matInput [(ngModel)]="data.city" [matAutocomplete]="">
+    <mat-autocomplete #auto="matAutocomplete">
+      <mat-option *ngFor="let option of options" [value]="option">
+        {{option}}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
    <mat-form-field>
      <mat-label>Pick a Color</mat-label>
      <input name="reminderColor" matInput name="color-picker" [(ngModel)]="data.color" />
