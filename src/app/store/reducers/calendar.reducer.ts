@@ -1,13 +1,13 @@
 import * as CalendarActions from '../actions/calendar.actions';
 import {createEntityAdapter, EntityAdapter, EntityState} from '@ngrx/entity';
 import {Action, createReducer, on} from '@ngrx/store';
-import {ICalendar} from '../../shared/model/calendar';
+import {CalendarDate} from '../../shared/model/calendar-date.model';
 
-export interface CalendarState extends EntityState<ICalendar> {
+export interface CalendarState extends EntityState<CalendarDate> {
   selectCalendarId: number | null;
 }
 
-export const adapter: EntityAdapter<ICalendar> = createEntityAdapter<ICalendar>();
+export const adapter: EntityAdapter<CalendarDate> = createEntityAdapter<CalendarDate>();
 
 const initialState: CalendarState = adapter.getInitialState({
   selectCalendarId: null
@@ -15,11 +15,12 @@ const initialState: CalendarState = adapter.getInitialState({
 
 const calendarDateReducer = createReducer(
   initialState,
-  on(CalendarActions.renderCalendar, (state, calendar: ICalendar ) => {
-    return adapter.addOne(calendar, state);
+  on(CalendarActions.renderCalendar, (state, { dates }  ) => {
+    return adapter.addMany(dates , state);
   }),
-  on(CalendarActions.getCalendar, (state) => {
-    return adapter.getSelectors().selectAll[0];
+  on(CalendarActions.addReminderToCalendar, (state: CalendarState, calendarDate: CalendarDate) => {
+    console.log('before update:', {id: calendarDate.id, changes: calendarDate});
+    return adapter.updateOne({id: calendarDate.id, changes: calendarDate}, state);
   })
 );
 
@@ -29,7 +30,11 @@ export function reducer(state: CalendarState | undefined, action: Action) {
 
 export const getSelectedCalendarId = (state: CalendarState) => state.selectCalendarId;
 
-export const getFirstCalendar = (state: CalendarState) => state.entities['0'].view;
+export const getAllCalendarDates = (state: CalendarState) => {
+  const calendarDates = [];
+  state.ids.forEach((i) => calendarDates.push(state.entities[i.toString]));
+  return calendarDates;
+};
 
 const {
   selectIds,

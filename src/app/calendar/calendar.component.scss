@@ -1,3 +1,7 @@
+.container{
+  margin-top: 5%;
+}
+
 .cols-7 {
   position: relative;
   width: calc(100%/7);
@@ -23,14 +27,36 @@
 }
 
 .calendar-date {
-  padding-left: 15px;
-  padding-right: 15px;
-  width: 100%;
+  //padding-left: 10px;
+  //padding-right: 10px;
+  ////width: 100%;
   height: 100px;
-  display: block;
   border: 1px solid #333;
+  float: left;
+  overflow: hidden;
 
   .calendar-day {
-    font-size: 0.5em;
+    font-size: 0.7em;
   }
+}
+
+.week-days-name {
+  background-color: #2e73b4;
+  color: #fff;
+}
+
+.calendar-date:nth-child(7n+7), .calendar-date:nth-child(0n+1) {
+  background-color: #f1f1f1;
+}
+
+.calendar-actions {
+  margin-bottom: 5px;
+  .add-reminder-btn {
+    background-color: #2e73b4;
+    color: #fff;
+  }
+}
+
+.reminder-badge {
+  cursor: pointer;
 }
