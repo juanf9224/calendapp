@@ -19,6 +19,7 @@ import {
   MatNativeDateModule,
   MatProgressBarModule,
   MatSidenavModule,
+  MatAutocompleteModule
 } from '@angular/material';
 
 import { ScrollingModule,
@@ -48,7 +49,8 @@ import { CdkTableModule } from '@angular/cdk/table';
       MatNativeDateModule,
       MatProgressBarModule,
       CdkTableModule,
-      MatSidenavModule
+      MatSidenavModule,
+      MatAutocompleteModule
     ],
     exports: [
       MatButtonModule,
@@ -72,7 +74,8 @@ import { CdkTableModule } from '@angular/cdk/table';
       MatNativeDateModule,
       MatProgressBarModule,
       CdkTableModule,
-      MatSidenavModule
+      MatSidenavModule,
+      MatAutocompleteModule
     ]
 })
 export class CustomMaterialModule {}

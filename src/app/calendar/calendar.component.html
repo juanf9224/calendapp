@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-md-6 float-md-right"></div>
     <div class="col-md-6 float-md-right">
-      <button mat-raised-button class="float-md-right">Add Reminder</button>
+      <button mat-raised-button class="float-md-right" (click)="openReminderDialog()">Add Reminder</button>
     </div>
   </div>
   <div class="row month-grid">
@@ -17,8 +17,9 @@
                 <div class="calendar-day">{{day.date.date()}}</div>
               </div>
               <div class="row">
-                <div class="reminder-badge">
-                  <mat-icon>alarm</mat-icon>
+                <div class="reminder-badge"
+                     *ngFor="let rem of day.reminder" (click)="editReminderDialog(rem)">
+                  <mat-icon [style.color]="rem?.color">alarm</mat-icon>
                 </div>
               </div>
             </div>
