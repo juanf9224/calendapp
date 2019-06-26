@@ -10,6 +10,7 @@ import {MatDialog} from '@angular/material';
 import {ReminderDialogComponent} from './reminder-dialog.component';
 import {IReminder, Reminder} from '../shared/model/reminder.model';
 import {ReminderService} from '../shared/service/reminder.service';
+import {WeatherService} from '../provider/weather/weather.service';
 
 @Component({
   selector: 'app-calendar',
@@ -24,7 +25,8 @@ export class CalendarComponent implements OnInit {
   constructor(
     private store: Store<fromCalendar.CalendarState>,
     private reminderService: ReminderService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private weatherService: WeatherService
   ) { }
 
   // Load calendar dates from store if available, else generate the calendar dates
@@ -68,13 +70,13 @@ export class CalendarComponent implements OnInit {
   openReminderDialog(): void {
     const dialogRef = this.dialog.open(ReminderDialogComponent, {
       width: '300px',
-      data: new Reminder()
+      data: new Reminder(),
+      disableClose: true
     });
-
     // After dialog closes, if reminder was created, then update calendar
     dialogRef.afterClosed().subscribe(() => {
         const reminder = this.reminderService.reminder;
-        const date = Object.assign({}, this.calendar.find(c => c.date.isSame(reminder.date)));
+        const date = Object.assign({}, this.calendar.find(c => c && c.date.isSame(reminder.date)));
 
         if (reminder && date && date.reminder) {
           reminder.id = date.reminder.length;

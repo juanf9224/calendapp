@@ -12,7 +12,7 @@ export class Reminder implements IReminder {
     public date?: any,
     public time?: any,
     public color?: string,
-    city?: string
+    public city?: string
   ) {}
 }
 

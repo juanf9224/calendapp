@@ -1,12 +1,12 @@
 <div class="container">
-  <div class="row">
+  <div class="row calendar-actions">
     <div class="col-md-6 float-md-right"></div>
     <div class="col-md-6 float-md-right">
-      <button mat-raised-button class="float-md-right" (click)="openReminderDialog()">Add Reminder</button>
+      <button mat-raised-button class="float-md-right add-reminder-btn" (click)="openReminderDialog()">Add Reminder</button>
     </div>
   </div>
   <div class="row month-grid">
-    <div *ngFor="let day of days" class="cols-7">
+    <div *ngFor="let day of days" class="cols-7 week-days-name">
       {{day}}
     </div>
     <div class="weeks">

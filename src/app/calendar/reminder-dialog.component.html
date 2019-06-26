@@ -1,14 +1,17 @@
 <h1 mat-dialog-title>Reminder creation</h1>
 <div mat-dialog-content>
+  <div *ngIf="forecast">
+    Weather forecast is: <mat-chip>{{forecast}}</mat-chip>
+  </div>
  <form #reminderForm="ngForm">
    <mat-form-field>
      <input matInput
             name="date"
-            pattern="^([0-2][0-9]|(3)[0-1])(-)(((0)[0-9])|((1)[0-2]))(-)\d{4}$"
+            [min]="currentDate"
             [matDatepicker]="picker" placeholder="Choose a date" [(ngModel)]="data.date" required>
      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
      <mat-datepicker #picker></mat-datepicker>
-     <mat-error *ngIf="data && !data.date">Date must be selected</mat-error>
+     <mat-error *ngIf="!data || !data.date">Date must be selected</mat-error>
    </mat-form-field>
    <mat-form-field>
      <input type="text"
@@ -18,7 +21,7 @@
             aria-label="Number"
             matInput [(ngModel)]="data.time"
             [matAutocomplete]="auto" required>
-     <mat-error *ngIf="data && !data.time">Time must be selected</mat-error>
+     <mat-error *ngIf="!data || !data.time">Time must be selected</mat-error>
      <mat-autocomplete #auto="matAutocomplete">
        <mat-option *ngFor="let option of dayTime" [value]="option">
          {{option}}
@@ -36,6 +39,7 @@
      <input name="reminderColor" matInput name="color-picker" [(ngModel)]="data.color" />
    </mat-form-field>
    <div mat-dialog-actions>
+     <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Cancel</button>
      <button mat-button (click)="onAddClick(data)" [disabled]="!reminderForm.valid">Add Reminder</button>
    </div>
  </form>
