@@ -10,7 +10,7 @@ export class WeatherService {
 
   constructor(private http: HttpClient) { }
 
-  getWeatherForeCast(city: string): Observable<HttpResponse<any>> {
-    return this.http.get(`${this.resourceUrl}/q=${city}`, {observe: 'response'});
+  public getWeatherForeCast(city: string): Observable<HttpResponse<any>> {
+    return this.http.get<any>(`${this.resourceUrl}/q=${city}&appid=915f878deab393159ff608d531511c99`, {observe: 'response'});
   }
 }

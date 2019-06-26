@@ -1,3 +1,7 @@
+.container{
+  margin-top: 5%;
+}
+
 .cols-7 {
   position: relative;
   width: calc(100%/7);
@@ -32,6 +36,27 @@
   overflow: hidden;
 
   .calendar-day {
-    font-size: 0.5em;
+    font-size: 0.7em;
   }
+}
+
+.week-days-name {
+  background-color: #2e73b4;
+  color: #fff;
+}
+
+.calendar-date:nth-child(7n+7), .calendar-date:nth-child(0n+1) {
+  background-color: #f1f1f1;
+}
+
+.calendar-actions {
+  margin-bottom: 5px;
+  .add-reminder-btn {
+    background-color: #2e73b4;
+    color: #fff;
+  }
+}
+
+.reminder-badge {
+  cursor: pointer;
 }
