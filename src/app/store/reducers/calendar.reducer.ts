@@ -19,6 +19,7 @@ const calendarDateReducer = createReducer(
     return adapter.addMany(dates , state);
   }),
   on(CalendarActions.addReminderToCalendar, (state: CalendarState, calendarDate: CalendarDate) => {
+    console.log('before update:', {id: calendarDate.id, changes: calendarDate});
     return adapter.updateOne({id: calendarDate.id, changes: calendarDate}, state);
   })
 );
