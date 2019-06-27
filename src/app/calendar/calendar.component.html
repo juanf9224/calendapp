@@ -19,7 +19,8 @@
               <div class="row">
                 <div class="reminder-badge"
                      *ngFor="let rem of day.reminder" (click)="editReminderDialog(rem)">
-                  <mat-icon [style.color]="rem?.color">alarm</mat-icon>
+                  <mat-icon [style.color]="rem?.color"
+                            [matTooltip]="rem?.description">alarm</mat-icon>
                 </div>
               </div>
             </div>
