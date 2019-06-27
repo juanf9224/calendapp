@@ -2,15 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import * as _ from 'lodash';
 import {select, Store} from '@ngrx/store';
+import {MatDialog} from '@angular/material';
 
 import {CalendarDate} from '../shared/model/calendar-date.model';
 import * as fromCalendar from '../store/reducers/calendar.reducer';
 import * as calendarActions from '../store/actions/calendar.actions';
-import {MatDialog} from '@angular/material';
 import {ReminderDialogComponent} from './reminder-dialog.component';
 import {IReminder, Reminder} from '../shared/model/reminder.model';
 import {ReminderService} from '../shared/service/reminder.service';
-import {WeatherService} from '../provider/weather/weather.service';
 
 @Component({
   selector: 'app-calendar',
@@ -26,7 +25,6 @@ export class CalendarComponent implements OnInit {
     private store: Store<fromCalendar.CalendarState>,
     private reminderService: ReminderService,
     private dialog: MatDialog,
-    private weatherService: WeatherService
   ) { }
 
   // Load calendar dates from store if available, else generate the calendar dates
@@ -95,35 +93,6 @@ export class CalendarComponent implements OnInit {
           console.log('date: ', date);
           this.store.dispatch(calendarActions.addReminderToCalendar(date));
         }
-    });
-  }
-
-  editReminderDialog(rem: IReminder): void {
-    const dialogRef = this.dialog.open(ReminderDialogComponent, {
-      width: '450px',
-      data: rem,
-      disableClose: true
-    });
-
-    // After dialog closes, if reminder was edited, then update calendar
-    dialogRef.afterClosed().subscribe(() => {
-      const reminder = this.reminderService.reminder;
-      if (reminder && reminder.date) {
-        const date = this.calendar.find(c => c.date.isSame(reminder.date));
-
-        if (date) {
-          const remi = date.reminder.find(r => r.id === reminder.id);
-          remi.date = moment(reminder.date).isSame(remi.date) ? remi.date : reminder.date;
-          remi.time = reminder.time === remi.time ? remi.time : reminder.time;
-          remi.color = reminder.color === remi.color ? remi.color : reminder.color;
-          remi.city = reminder.city === remi.city ? remi.city : reminder.city;
-          remi.description = reminder.description === remi.description ? remi.description : reminder.description;
-        } else {
-          return;
-        }
-        console.log('date and reminder: ', date, reminder);
-        this.store.dispatch(calendarActions.addReminderToCalendar(date));
-      }
     });
   }
 }
