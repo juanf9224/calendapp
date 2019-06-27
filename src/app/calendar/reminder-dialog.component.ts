@@ -19,6 +19,7 @@ export class ReminderDialogComponent implements OnInit {
   currentDate = new Date();
   forecast: any;
   filteredOptions: Observable<string[]>;
+  reminderData: IReminder;
 
   constructor(
     public dialogRef: MatDialogRef<ReminderDialogComponent>,
@@ -30,10 +31,12 @@ export class ReminderDialogComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.data && this.data.city) {
-      this.weatherService.fetchWeatherForeCast(this.data.city)
-        .subscribe(w => this.lookupForecast(w.body.list, this.data.date || moment()));
+      this.reminderData = Object.assign({}, this.data);
+      this.weatherService.fetchWeatherForeCast(this.reminderData.city)
+        .subscribe(w => this.lookupForecast(w.body.list, this.reminderData.date || moment()));
     } else {
-      this.data = new Reminder();
+      this.reminderData = this.data = new Reminder();
+      console.log(this.reminderData);
     }
   }
 
@@ -44,8 +47,8 @@ export class ReminderDialogComponent implements OnInit {
 
   onCityChanges(): void {
     console.log('city change');
-    if (this.data && this.data.city && this.data.city.length >= 4) {
-      this.filteredOptions = of(this.data.city).pipe(
+    if (this.reminderData && this.reminderData.city && this.reminderData.city.length >= 4) {
+      this.filteredOptions = of(this.reminderData.city).pipe(
         startWith(''),
         map(value => this._filter(value))
       );
@@ -64,23 +67,22 @@ export class ReminderDialogComponent implements OnInit {
       const hours = parseInt(`${reminder.time}`.substring(0, reminder.time.indexOf(':')), 10);
       const minutes = parseInt(`${reminder.time}`.substring(reminder.time.indexOf(':'), reminder.time.length), 10);
       // reminder.date = moment(`${reminder.date}`).add(hours, 'hours').add(minutes, 'minutes');
-      const createdReminder = this.createReminder(reminder, hours, minutes);
-      console.log(createdReminder.date);
-      if (moment(createdReminder.date).isSameOrAfter(moment())) {
-        this.reminderService.reminder = createdReminder;
+      const reminderDatetime = this.createDateTime(reminder, hours, minutes);
+      console.log('rem date vs moment: ', reminderDatetime, moment());
+      if (moment(reminderDatetime).isSameOrAfter(moment())) {
+        this.reminderService.reminder = this.reminderData;
         this.dialogRef.close();
       } else {
         this.handleError(`
           Could not create reminder, date should not be a past date time:
-          actual: ${moment()} reminder: ${createdReminder.date}`);
+          actual: ${moment()} reminder: ${reminderDatetime}`);
       }
     }
   }
 
-  private createReminder(rem: IReminder, hours: number, minutes: number): IReminder {
-    const reminder = Object.assign(new Reminder(), rem);
-    reminder.date = moment(rem.date).hours(hours).minutes(minutes);
-    return reminder;
+  private createDateTime(rem: IReminder, hours: number, minutes: number): moment.Moment {
+    const reminderDateTime = Object.assign(moment(), rem.date);
+    return reminderDateTime.hour(hours).minutes(minutes);
   }
 
   clearReminder(): void {
@@ -94,6 +96,6 @@ export class ReminderDialogComponent implements OnInit {
   }
 
   private isSameDate(a: moment.Moment, b: moment.Moment): boolean {
-      return a.month() === b.month() && a.date() === b.date();
+      return moment(a).month() === moment(b).month() && moment(a).date() === moment(b).date();
   }
 }
