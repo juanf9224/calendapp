@@ -1,0 +1,37 @@
+<h1 mat-dialog-title>Expanded Date View</h1>
+<div mat-dialog-content>
+  <div class="row date-info">
+      <div class="col-md-12 text-center"><mat-label>Date: {{selectedCalendarDate}}</mat-label></div>
+  </div>
+  <div class="row">
+    
+    <div *ngIf="day.reminder && day.reminder.length > 0; else no_reminders" class="col-md-12">
+      <mat-accordion>
+        <mat-expansion-panel *ngFor="let rem of reminders">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              id: {{rem.id}}
+            </mat-panel-title>
+            <mat-panel-description>
+              {{rem.description}}
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <div *ngIf="forecast" class="weather-forecast">
+            <mat-label>Weather forecast is: </mat-label>
+            <mat-chip>{{forecast.description}}</mat-chip>
+          </div>
+          <app-reminder-form [reminder]="rem" (saveReminder)="updateReminder($event)" [showCancelBtn]="false"></app-reminder-form>
+        </mat-expansion-panel>
+      </mat-accordion>
+      <div matDialogActions>
+          <button mat-button [mat-dialog-close]="day" cdkFocusInitial >Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #no_reminders>
+  <div class="alert-primary no-reminders-alert">
+    No reminders for this date.
+  </div>
+</ng-template>

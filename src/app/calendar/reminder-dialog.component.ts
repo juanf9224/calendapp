@@ -2,23 +2,17 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef, MatSnackBar} from '@angular/material';
 import {IReminder, Reminder} from '../shared/model/reminder.model';
 import * as moment from 'moment';
-import {DAY_TIME, BULK_CITIES} from '../shared/constants';
 import {ReminderService} from '../shared/service/reminder.service';
 import {WeatherService} from '../provider/weather/weather.service';
-import { Observable, of } from 'rxjs';
-import {map, startWith} from 'rxjs/operators';
-import { ICity } from '../shared/model/city.model';
 
 @Component({
   selector: 'app-reminder-dialog',
-  templateUrl: 'reminder-dialog.component.html'
+  templateUrl: 'reminder-dialog.component.html',
+  styleUrls: ['reminder-dialog.component.scss']
 })
 export class ReminderDialogComponent implements OnInit {
-  dayTime = DAY_TIME;
-  cities: ICity[] = [...BULK_CITIES];
   currentDate = new Date();
   forecast: any;
-  filteredOptions: Observable<string[]>;
   reminderData: IReminder;
 
   constructor(
@@ -35,34 +29,16 @@ export class ReminderDialogComponent implements OnInit {
       this.weatherService.fetchWeatherForeCast(this.reminderData.city)
         .subscribe(w => this.lookupForecast(w.body.list, this.reminderData.date || moment()));
     } else {
-      this.reminderData = this.data = new Reminder();
-      console.log(this.reminderData);
+      this.reminderData = new Reminder();
     }
   }
 
   private lookupForecast(list: any[], date: moment.Moment) {
     this.forecast = list.find(f => this.isSameDate(moment(f.dt_txt), date)).weather[0];
-    console.log(this.forecast);
-  }
-
-  onCityChanges(): void {
-    console.log('city change');
-    if (this.reminderData && this.reminderData.city && this.reminderData.city.length >= 4) {
-      this.filteredOptions = of(this.reminderData.city).pipe(
-        startWith(''),
-        map(value => this._filter(value))
-      );
-    }
-  }
-
-  private _filter(value: string): string[] {
-    const filterValue = value.toLowerCase();
-    return this.cities
-      .filter(option => option.city.toLowerCase().includes(filterValue))
-      .map(c => `${c.city}, ${c.country}`);
   }
 
   onAddClick(reminder: IReminder): void {
+    console.log('reminder from output', reminder);
     if (reminder && reminder.date) {
       const hours = parseInt(`${reminder.time}`.substring(0, reminder.time.indexOf(':')), 10);
       const minutes = parseInt(`${reminder.time}`.substring(reminder.time.indexOf(':'), reminder.time.length), 10);
@@ -81,8 +57,9 @@ export class ReminderDialogComponent implements OnInit {
   }
 
   private createDateTime(rem: IReminder, hours: number, minutes: number): moment.Moment {
-    const reminderDateTime = Object.assign(moment(), rem.date);
-    return reminderDateTime.hour(hours).minutes(minutes);
+    const reminderDateTime: moment.Moment = moment(rem.date);
+    console.log('reminderDateTime', reminderDateTime);
+    return moment(reminderDateTime).hour(hours).minutes(minutes);
   }
 
   clearReminder(): void {
