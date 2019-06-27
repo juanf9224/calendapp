@@ -71,25 +71,30 @@ export class CalendarComponent implements OnInit {
       width: '450px',
       disableClose: true
     });
-    // After dialog closes, if reminder was created, then update calendar
-    dialogRef.afterClosed().subscribe(() => {
-        const reminder = this.reminderService.reminder;
-        console.log('calendar', this.calendar.find(c => c && c.date.get('date') === reminder.date.get('date')));
-        const date = Object.assign({}, this.calendar
-          .find(c => c && c.date.month() === reminder.date.month() && c.date.date() === reminder.date.date()));
 
-        if (reminder && date && date.reminder) {
-          reminder.id = date.reminder.length;
-          date.reminder.push(reminder);
-        } else if (reminder && date) {
-          // console.log('no reminders for this date', reminder);
-          reminder.id = 0;
-          date.reminder = [reminder];
-        } else {
-          return;
+    // After dialog closes, if reminder was created, then update calendar
+    dialogRef.afterClosed()
+    .subscribe(() => {
+        const reminder = Object.assign(new Reminder(), this.reminderService.reminder);
+
+        if (reminder && reminder.date) {
+          // console.log('reminder ', reminder.date);
+          const date = Object.assign({}, this.calendar
+            .find(c => c && c.date.month() === moment(reminder.date).month() && c.date.date() === moment(reminder.date).date()));
+
+          if (reminder && date && date.reminder) {
+            reminder.id = date.reminder.length;
+            date.reminder.push(reminder);
+          } else if (reminder && date) {
+            // console.log('no reminders for this date', reminder);
+            reminder.id = 0;
+            date.reminder = [reminder];
+          } else {
+            return;
+          }
+          console.log('date: ', date);
+          this.store.dispatch(calendarActions.addReminderToCalendar(date));
         }
-        console.log('date: ', date);
-        this.store.dispatch(calendarActions.addReminderToCalendar(date));
     });
   }
 
@@ -103,16 +108,22 @@ export class CalendarComponent implements OnInit {
     // After dialog closes, if reminder was edited, then update calendar
     dialogRef.afterClosed().subscribe(() => {
       const reminder = this.reminderService.reminder;
-      const date = this.calendar.find(c => c.date.isSame(reminder.date));
+      if (reminder && reminder.date) {
+        const date = this.calendar.find(c => c.date.isSame(reminder.date));
 
-      if (date) {
-        let remi = date.reminder.find(r => r.id === reminder.id);
-        remi = reminder;
-      } else {
-        return;
+        if (date) {
+          const remi = date.reminder.find(r => r.id === reminder.id);
+          remi.date = moment(reminder.date).isSame(remi.date) ? remi.date : reminder.date;
+          remi.time = reminder.time === remi.time ? remi.time : reminder.time;
+          remi.color = reminder.color === remi.color ? remi.color : reminder.color;
+          remi.city = reminder.city === remi.city ? remi.city : reminder.city;
+          remi.description = reminder.description === remi.description ? remi.description : reminder.description;
+        } else {
+          return;
+        }
+        console.log('date and reminder: ', date, reminder);
+        this.store.dispatch(calendarActions.addReminderToCalendar(date));
       }
-      console.log(date);
-      this.store.dispatch(calendarActions.addReminderToCalendar(date));
     });
   }
 }

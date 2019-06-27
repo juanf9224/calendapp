@@ -4,7 +4,7 @@
     <mat-label>Weather forecast is: </mat-label><mat-chip>{{forecast.description}}</mat-chip>
   </div>
  <form #reminderForm="ngForm">
-   <mat-form-field>
+   <mat-form-field [ngClass]="{'reminder-form-field': true}">
      <mat-label>Description</mat-label>
      <input
        name="reminderDesc"
@@ -12,31 +12,31 @@
        matInput
        [(ngModel)]="data.description" />
    </mat-form-field>
-   <mat-form-field>
+   <mat-form-field class="reminder-form-field">
      <input matInput
             name="date"
             [min]="currentDate"
-            [matDatepicker]="picker" placeholder="Choose a date" [(ngModel)]="data.date" required>
+            [matDatepicker]="picker" placeholder="Choose a date" [(ngModel)]="reminderData.date" required>
      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
      <mat-datepicker #picker></mat-datepicker>
-     <mat-error *ngIf="!data || !data.date">Date must be selected</mat-error>
+     <mat-error *ngIf="!reminderData || !reminderData.date">Date must be selected</mat-error>
    </mat-form-field>
-   <mat-form-field>
+   <mat-form-field class="reminder-form-field">
      <input type="text"
             name="time"
             pattern="^(0[0-9]|1[0-9]|2[0-3]|[0-9]):[0-5][0-9]$"
             placeholder="Pick time"
             aria-label="Number"
-            matInput [(ngModel)]="data.time"
+            matInput [(ngModel)]="reminderData.time"
             [matAutocomplete]="timeAuto" required>
-     <mat-error *ngIf="!data || !data.time">Time must be selected</mat-error>
+     <mat-error *ngIf="!reminderData || !reminderData.time">Time must be selected</mat-error>
      <mat-autocomplete #timeAuto="matAutocomplete">
        <mat-option *ngFor="let option of dayTime" [value]="option">
          {{option}}
        </mat-option>
      </mat-autocomplete>
    </mat-form-field>
-   <mat-form-field>
+   <mat-form-field class="reminder-form-field">
     <input
       name="reminderCity"
       type="text"
@@ -44,7 +44,7 @@
       aria-label="Number"
       matInput
       (ngModelChange)="onCityChanges()"
-      [(ngModel)]="data.city"
+      [(ngModel)]="reminderData.city"
       [matAutocomplete]="cityAuto">
     <mat-autocomplete #cityAuto="matAutocomplete">
       <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
@@ -52,13 +52,13 @@
       </mat-option>
     </mat-autocomplete>
   </mat-form-field>
-   <mat-form-field>
+   <mat-form-field class="reminder-form-field">
      <mat-label>Pick a Color</mat-label>
-     <input name="reminderColor" matInput [(ngModel)]="data.color" />
+     <input name="reminderColor" matInput [(ngModel)]="reminderData.color" />
    </mat-form-field>
    <div mat-dialog-actions>
-     <button mat-button [mat-dialog-close]="data" cdkFocusInitial (click)="clearReminder()">Cancel</button>
-     <button mat-button (click)="onAddClick(data)" [disabled]="!reminderForm.valid">Add Reminder</button>
+     <button mat-button [mat-dialog-close]="reminderData" cdkFocusInitial (click)="clearReminder()">Cancel</button>
+     <button mat-button (click)="onAddClick(reminderData)" [disabled]="!reminderForm.valid">Add Reminder</button>
    </div>
  </form>
 </div>
