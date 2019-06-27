@@ -1,9 +1,17 @@
 <h1 mat-dialog-title>Reminder creation</h1>
 <div mat-dialog-content>
-  <div *ngIf="forecast">
-    Weather forecast is: <mat-chip>{{forecast}}</mat-chip>
+  <div *ngIf="forecast" class="weather-forecast">
+    <mat-label>Weather forecast is: </mat-label><mat-chip>{{forecast.description}}</mat-chip>
   </div>
  <form #reminderForm="ngForm">
+   <mat-form-field>
+     <mat-label>Description</mat-label>
+     <input
+       name="reminderDesc"
+       maxlength="30"
+       matInput
+       [(ngModel)]="data.description" />
+   </mat-form-field>
    <mat-form-field>
      <input matInput
             name="date"
@@ -20,26 +28,36 @@
             placeholder="Pick time"
             aria-label="Number"
             matInput [(ngModel)]="data.time"
-            [matAutocomplete]="auto" required>
+            [matAutocomplete]="timeAuto" required>
      <mat-error *ngIf="!data || !data.time">Time must be selected</mat-error>
-     <mat-autocomplete #auto="matAutocomplete">
+     <mat-autocomplete #timeAuto="matAutocomplete">
        <mat-option *ngFor="let option of dayTime" [value]="option">
          {{option}}
        </mat-option>
      </mat-autocomplete>
    </mat-form-field>
    <mat-form-field>
-     <mat-label>City</mat-label>
-     <input
-       name="city"
-       matInput [(ngModel)]="data.city" />
-   </mat-form-field>
+    <input
+      name="reminderCity"
+      type="text"
+      placeholder="Pick a city"
+      aria-label="Number"
+      matInput
+      (ngModelChange)="onCityChanges()"
+      [(ngModel)]="data.city"
+      [matAutocomplete]="cityAuto">
+    <mat-autocomplete #cityAuto="matAutocomplete">
+      <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+        {{option}}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
    <mat-form-field>
      <mat-label>Pick a Color</mat-label>
-     <input name="reminderColor" matInput name="color-picker" [(ngModel)]="data.color" />
+     <input name="reminderColor" matInput [(ngModel)]="data.color" />
    </mat-form-field>
    <div mat-dialog-actions>
-     <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Cancel</button>
+     <button mat-button [mat-dialog-close]="data" cdkFocusInitial (click)="clearReminder()">Cancel</button>
      <button mat-button (click)="onAddClick(data)" [disabled]="!reminderForm.valid">Add Reminder</button>
    </div>
  </form>

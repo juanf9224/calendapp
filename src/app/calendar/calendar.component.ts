@@ -47,18 +47,17 @@ export class CalendarComponent implements OnInit {
   // Generate calendar
   generateCalendar() {
     const dates = this.fillDates(this.currentDate);
-    // console.log(dates.slice());
     this.store.dispatch(calendarActions.renderCalendar({ dates }));
   }
 
   // generate dates range to populate the calendar with actual month dates
   fillDates(currDate: moment.Moment): CalendarDate[] {
-    const firstDayOfMonth = moment(currDate).startOf('month').day();
-    const firstDayOrfGrid = moment(currDate).startOf('month').subtract(firstDayOfMonth, 'days');
-    const start = firstDayOrfGrid.date();
+    const firstDayOfMonth = moment(currDate).startOf('month').days();
+    const firstDayOfGrid = moment(currDate).startOf('month').subtract(firstDayOfMonth, 'days');
+    const start = firstDayOfGrid.date();
     return _.range(start, start + 42)
       .map((date: number, idx: number): CalendarDate => {
-          const d = moment(firstDayOrfGrid).date(date);
+          const d = moment(firstDayOfGrid).date(date);
           return {
             id: idx,
             date: d
@@ -69,33 +68,36 @@ export class CalendarComponent implements OnInit {
   // Opens dialog to add reminder
   openReminderDialog(): void {
     const dialogRef = this.dialog.open(ReminderDialogComponent, {
-      width: '300px',
-      data: new Reminder(),
+      width: '450px',
       disableClose: true
     });
     // After dialog closes, if reminder was created, then update calendar
     dialogRef.afterClosed().subscribe(() => {
         const reminder = this.reminderService.reminder;
-        const date = Object.assign({}, this.calendar.find(c => c && c.date.isSame(reminder.date)));
+        console.log('calendar', this.calendar.find(c => c && c.date.get('date') === reminder.date.get('date')));
+        const date = Object.assign({}, this.calendar
+          .find(c => c && c.date.month() === reminder.date.month() && c.date.date() === reminder.date.date()));
 
         if (reminder && date && date.reminder) {
           reminder.id = date.reminder.length;
           date.reminder.push(reminder);
         } else if (reminder && date) {
-          console.log('no reminder');
+          // console.log('no reminders for this date', reminder);
           reminder.id = 0;
           date.reminder = [reminder];
         } else {
           return;
         }
+        console.log('date: ', date);
         this.store.dispatch(calendarActions.addReminderToCalendar(date));
     });
   }
 
   editReminderDialog(rem: IReminder): void {
     const dialogRef = this.dialog.open(ReminderDialogComponent, {
-      width: '300px',
-      data: rem
+      width: '450px',
+      data: rem,
+      disableClose: true
     });
 
     // After dialog closes, if reminder was edited, then update calendar
