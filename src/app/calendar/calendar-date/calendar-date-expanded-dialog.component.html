@@ -4,8 +4,8 @@
       <div class="col-md-12 text-center"><mat-label>Date: {{selectedCalendarDate}}</mat-label></div>
   </div>
   <div class="row">
-    
     <div *ngIf="day.reminder && day.reminder.length > 0; else no_reminders" class="col-md-12">
+      <button mat-raised-button color="warn" class="mt-2 mb-2" (click)="deleteAllReminders()">Delete all reminders</button>
       <mat-accordion>
         <mat-expansion-panel *ngFor="let rem of reminders">
           <mat-expansion-panel-header>
@@ -20,6 +20,7 @@
             <mat-label>Weather forecast is: </mat-label>
             <mat-chip>{{forecast.description}}</mat-chip>
           </div>
+          <button mat-icon-button><mat-icon color="warn" (click)="deleteOneReminder(rem)">delete_forever</mat-icon></button>
           <app-reminder-form [reminder]="rem" (saveReminder)="updateReminder($event)" [showCancelBtn]="false"></app-reminder-form>
         </mat-expansion-panel>
       </mat-accordion>

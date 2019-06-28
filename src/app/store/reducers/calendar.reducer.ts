@@ -9,7 +9,7 @@ export interface CalendarState extends EntityState<CalendarDate> {
 
 export const adapter: EntityAdapter<CalendarDate> = createEntityAdapter<CalendarDate>();
 
-const initialState: CalendarState = adapter.getInitialState({
+export const initialState: CalendarState = adapter.getInitialState({
   selectCalendarId: null
 });
 
@@ -19,7 +19,12 @@ const calendarDateReducer = createReducer(
     return adapter.addMany(dates , state);
   }),
   on(CalendarActions.addReminderToCalendar, (state: CalendarState, calendarDate: CalendarDate) => {
-    console.log('before update:', {id: calendarDate.id, changes: calendarDate});
+    return adapter.updateOne({id: calendarDate.id, changes: calendarDate}, state);
+  }),
+  on(CalendarActions.removeReminderFromCalendarDate, (state: CalendarState, calendarDate: CalendarDate) => {
+    return adapter.updateOne({id: calendarDate.id, changes: calendarDate}, state);
+  }),
+  on(CalendarActions.removeAllRemindersFromCalendarDate, (state: CalendarState, calendarDate: CalendarDate) => {
     return adapter.updateOne({id: calendarDate.id, changes: calendarDate}, state);
   })
 );

@@ -1,45 +1,42 @@
-import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef, MatSnackBar, MatDialog, MatDialogConfig} from '@angular/material';
-import {IReminder, Reminder} from '../../shared/model/reminder.model';
+import {ChangeDetectionStrategy, Component, Inject, OnInit} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
+import {IReminder} from '../../shared/model/reminder.model';
 import * as moment from 'moment';
-import { Observable, of } from 'rxjs';
 
-import { CalendarDate } from 'src/app/shared/model/calendar-date.model';
-import {DAY_TIME, BULK_CITIES} from '../../shared/constants';
+import {CalendarDate} from 'src/app/shared/model/calendar-date.model';
+import {DAY_TIME} from '../../shared/constants';
 import {ReminderService} from '../../shared/service/reminder.service';
 import {WeatherService} from '../../provider/weather/weather.service';
-import { ReminderDialogComponent } from '../reminder-dialog.component';
 import * as fromCalendar from '../../store/reducers/calendar.reducer';
 import * as calendarActions from '../../store/actions/calendar.actions';
-import { Store } from '@ngrx/store';
+import {Store} from '@ngrx/store';
 
 @Component({
   selector: 'app-reminder-dialog',
   templateUrl: 'calendar-date-expanded-dialog.component.html',
-  styleUrls: ['calendar-date-expanded-dialog.component.scss']
+  styleUrls: ['calendar-date-expanded-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CalendarDateExpandedDialogComponent implements OnInit {
   dayTime = DAY_TIME;
   currentDate = moment();
   forecast: any;
   selectedCalendarDate: string;
-  filteredOptions: Observable<string[]>;
   reminders: IReminder[];
-  expanded = false;
   calendar: CalendarDate[];
   day: CalendarDate;
 
   constructor(
     public dialogRef: MatDialogRef<CalendarDateExpandedDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: {day: CalendarDate, calendar: CalendarDate[]},
+    @Inject(MAT_DIALOG_DATA) public data: CalendarDate,
     private reminderService: ReminderService,
     private weatherService: WeatherService,
     private store: Store<fromCalendar.CalendarState>,
   ) {}
 
   ngOnInit(): void {
-    this.day = this.data.day;
-    this.calendar = this.data.calendar;
+    this.day = this.data;
+    console.log(this.data, this.day);
     this.selectedCalendarDate = `${this.day.date.month()}-${this.day.date.date()}-${this.day.date.year()}`;
     console.log(this.data);
     if (this.day && this.day.reminder && this.day.reminder.length > 0) {
@@ -63,7 +60,7 @@ export class CalendarDateExpandedDialogComponent implements OnInit {
   updateReminder(rem: IReminder): void {
       const reminder = rem;
       if (reminder && reminder.date) {
-        const date = this.calendar.find(c => c.date.isSame(reminder.date));
+        const date = Object.assign({}, this.day);
 
         if (date) {
           const remi = date.reminder.find(r => r.id === reminder.id);
@@ -80,8 +77,21 @@ export class CalendarDateExpandedDialogComponent implements OnInit {
       }
   }
 
-  clearReminder(): void {
-    this.reminderService.reminder = null;
+  deleteOneReminder(rem: IReminder) {
+    const reminder = rem;
+    if (reminder && reminder.date) {
+      const date = Object.assign({}, this.day);
+      date.reminder = date.reminder.filter(f => f.id !== reminder.id);
+      this.store.dispatch(calendarActions.removeReminderFromCalendarDate(date));
+      this.ngOnInit();
+    }
+  }
+
+  deleteAllReminders() {
+      const date = Object.assign({}, this.day);
+      date.reminder = [];
+      this.store.dispatch(calendarActions.removeReminderFromCalendarDate(date));
+      this.ngOnInit();
   }
 
   private isSameDate(a: moment.Moment, b: moment.Moment): boolean {

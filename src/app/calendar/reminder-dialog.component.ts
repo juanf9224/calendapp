@@ -1,19 +1,22 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef, MatSnackBar} from '@angular/material';
 import {IReminder, Reminder} from '../shared/model/reminder.model';
 import * as moment from 'moment';
 import {ReminderService} from '../shared/service/reminder.service';
 import {WeatherService} from '../provider/weather/weather.service';
+import {ReplaySubject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-reminder-dialog',
   templateUrl: 'reminder-dialog.component.html',
   styleUrls: ['reminder-dialog.component.scss']
 })
-export class ReminderDialogComponent implements OnInit {
+export class ReminderDialogComponent implements OnInit, OnDestroy {
   currentDate = new Date();
   forecast: any;
   reminderData: IReminder;
+  unsubscribe$: ReplaySubject<boolean> = new ReplaySubject(1);
 
   constructor(
     public dialogRef: MatDialogRef<ReminderDialogComponent>,
@@ -27,6 +30,7 @@ export class ReminderDialogComponent implements OnInit {
     if (this.data && this.data.city) {
       this.reminderData = Object.assign({}, this.data);
       this.weatherService.fetchWeatherForeCast(this.reminderData.city)
+        .pipe(takeUntil(this.unsubscribe$))
         .subscribe(w => this.lookupForecast(w.body.list, this.reminderData.date || moment()));
     } else {
       this.reminderData = new Reminder();
@@ -74,5 +78,10 @@ export class ReminderDialogComponent implements OnInit {
 
   private isSameDate(a: moment.Moment, b: moment.Moment): boolean {
       return moment(a).month() === moment(b).month() && moment(a).date() === moment(b).date();
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe$.next(true);
+    this.unsubscribe$.complete();
   }
 }
