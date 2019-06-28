@@ -1,0 +1,41 @@
+
+<form #reminderForm="ngForm">
+    <mat-form-field [ngClass]="{'reminder-form-field': true}">
+      <mat-label>Description</mat-label>
+      <input name="reminderDesc" maxlength="30" matInput [(ngModel)]="reminder.description" />
+    </mat-form-field>
+    <mat-form-field [ngClass]="{'reminder-form-field': true}">
+      <input matInput name="date" [min]="currentDate" [matDatepicker]="picker" placeholder="Choose a date"
+        [(ngModel)]="reminder.date" required>
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error *ngIf="!reminder || !reminder.date">Date must be selected</mat-error>
+    </mat-form-field>
+    <mat-form-field [ngClass]="{'reminder-form-field': true}">
+      <input type="text" name="time" pattern="^(0[0-9]|1[0-9]|2[0-3]|[0-9]):[0-5][0-9]$" placeholder="Pick time"
+        aria-label="Number" matInput [(ngModel)]="reminder.time" [matAutocomplete]="timeAuto" required>
+      <mat-error *ngIf="!reminder || !reminder.time">Time must be selected</mat-error>
+      <mat-autocomplete #timeAuto="matAutocomplete">
+        <mat-option *ngFor="let option of dayTime" [value]="option">
+          {{option}}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+    <mat-form-field [ngClass]="{'reminder-form-field': true}">
+      <input name="reminderCity" type="text" placeholder="Pick a city" aria-label="Number" matInput
+        (ngModelChange)="onCityChanges(reminder)" [(ngModel)]="reminder.city" [matAutocomplete]="cityAuto">
+      <mat-autocomplete #cityAuto="matAutocomplete">
+        <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+          {{option}}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+    <mat-form-field [ngClass]="{'reminder-form-field': true}">
+      <mat-label>Pick a Color</mat-label>
+      <input name="reminderColor" matInput [(ngModel)]="reminder.color" />
+    </mat-form-field>
+    <div>
+      <button mat-button *ngIf="showCancelBtn" [mat-dialog-close]="reminder" cdkFocusInitial (click)="onCancel()">Cancel</button>
+      <button mat-button (click)="onAddClick(reminder)" [disabled]="!reminderForm.valid">Add Reminder</button>
+    </div>
+  </form>

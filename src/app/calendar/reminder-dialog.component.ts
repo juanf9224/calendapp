@@ -1,19 +1,22 @@
-import {Component, EventEmitter, Inject, OnInit, Output} from '@angular/core';
+import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef, MatSnackBar} from '@angular/material';
-import {IReminder} from '../shared/model/reminder.model';
+import {IReminder, Reminder} from '../shared/model/reminder.model';
 import * as moment from 'moment';
-import {DAY_TIME} from '../shared/constants/day-time';
 import {ReminderService} from '../shared/service/reminder.service';
 import {WeatherService} from '../provider/weather/weather.service';
+import {ReplaySubject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-reminder-dialog',
-  templateUrl: 'reminder-dialog.component.html'
+  templateUrl: 'reminder-dialog.component.html',
+  styleUrls: ['reminder-dialog.component.scss']
 })
-export class ReminderDialogComponent implements OnInit {
-  dayTime = DAY_TIME;
+export class ReminderDialogComponent implements OnInit, OnDestroy {
   currentDate = new Date();
-  forecast: string;
+  forecast: any;
+  reminderData: IReminder;
+  unsubscribe$: ReplaySubject<boolean> = new ReplaySubject(1);
 
   constructor(
     public dialogRef: MatDialogRef<ReminderDialogComponent>,
@@ -25,17 +28,60 @@ export class ReminderDialogComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.data && this.data.city) {
-      this.weatherService.getWeatherForeCast(this.data.city)
-        .subscribe(w => this.forecast = w.body.weather.main);
+      this.reminderData = Object.assign({}, this.data);
+      this.weatherService.fetchWeatherForeCast(this.reminderData.city)
+        .pipe(takeUntil(this.unsubscribe$))
+        .subscribe(w => this.lookupForecast(w.body.list, this.reminderData.date || moment()));
+    } else {
+      this.reminderData = new Reminder();
     }
   }
 
+  private lookupForecast(list: any[], date: moment.Moment) {
+    this.forecast = list.find(f => this.isSameDate(moment(f.dt_txt), date)).weather[0];
+  }
+
   onAddClick(reminder: IReminder): void {
-    if (reminder && reminder.date && moment(reminder.date).isSameOrAfter(moment(new Date()))) {
-      this.reminderService.reminder = reminder;
-      this.dialogRef.close();
-    } else {
-      this.snackBar.open('Could not create reminder', 'Ok', {duration: 4000});
+    console.log('reminder from output', reminder);
+    if (reminder && reminder.date) {
+      const hours = parseInt(`${reminder.time}`.substring(0, reminder.time.indexOf(':')), 10);
+      const minutes = parseInt(`${reminder.time}`.substring(reminder.time.indexOf(':'), reminder.time.length), 10);
+      // reminder.date = moment(`${reminder.date}`).add(hours, 'hours').add(minutes, 'minutes');
+      const reminderDatetime = this.createDateTime(reminder, hours, minutes);
+      console.log('rem date vs moment: ', reminderDatetime, moment());
+      if (moment(reminderDatetime).isSameOrAfter(moment())) {
+        this.reminderService.reminder = this.reminderData;
+        this.dialogRef.close();
+      } else {
+        this.handleError(`
+          Could not create reminder, date should not be a past date time:
+          actual: ${moment()} reminder: ${reminderDatetime}`);
+      }
     }
+  }
+
+  private createDateTime(rem: IReminder, hours: number, minutes: number): moment.Moment {
+    const reminderDateTime: moment.Moment = moment(rem.date);
+    console.log('reminderDateTime', reminderDateTime);
+    return moment(reminderDateTime).hour(hours).minutes(minutes);
+  }
+
+  clearReminder(): void {
+    this.reminderService.reminder = null;
+  }
+
+  private handleError(msg: string, action?: string, waitTime?: number) {
+    this.snackBar
+      .open(msg,
+        action || 'Ok', {duration: waitTime || 4000});
+  }
+
+  private isSameDate(a: moment.Moment, b: moment.Moment): boolean {
+      return moment(a).month() === moment(b).month() && moment(a).date() === moment(b).date();
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe$.next(true);
+    this.unsubscribe$.complete();
   }
 }

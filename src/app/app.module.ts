@@ -11,12 +11,18 @@ import {SharedModule} from './shared/shared.module';
 import { CalendarComponent } from './calendar/calendar.component';
 import {reducers} from './store/reducers';
 import {ReminderDialogComponent} from './calendar/reminder-dialog.component';
+import { CalendarDateComponent } from './calendar/calendar-date/calendar-date.component';
+import { CalendarDateExpandedDialogComponent } from './calendar/calendar-date/calendar-date-expanded-dialog.component';
+import { ReminderFormComponent } from './calendar/reminder-form/reminder-form.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     CalendarComponent,
-    ReminderDialogComponent
+    ReminderDialogComponent,
+    CalendarDateComponent,
+    CalendarDateExpandedDialogComponent,
+    ReminderFormComponent
   ],
   imports: [
     BrowserModule,
@@ -28,7 +34,8 @@ import {ReminderDialogComponent} from './calendar/reminder-dialog.component';
     StoreDevtoolsModule.instrument({maxAge: 10})
   ],
   entryComponents: [
-    ReminderDialogComponent
+    ReminderDialogComponent,
+    CalendarDateExpandedDialogComponent
   ],
   providers: [],
   bootstrap: [AppComponent]
