@@ -47,6 +47,9 @@ export class CalendarDateComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    if (this.day &&  this.day.reminder) {
+      this.day.reminder.sort((a, b) => a.date.isBefore(b.date) ? 1 : -1);
+    }
   }
 
   editReminderDialog(rem: IReminder): void {
@@ -60,7 +63,7 @@ export class CalendarDateComponent implements OnInit {
     dialogRef.afterClosed().subscribe(() => {
       const reminder = this.reminderService.reminder;
       if (reminder && reminder.date) {
-        const date = this.calendar.find(c => c.date.isSame(reminder.date));
+        const date = this.day;
 
         if (date) {
           const remi = date.reminder.find(r => r.id === reminder.id);
@@ -81,7 +84,7 @@ export class CalendarDateComponent implements OnInit {
   openCalendarDialog() {
     const dialogRef = this.dialog.open(CalendarDateExpandedDialogComponent, {
       width: '50%',
-      data: { day: this.day, calendar: this.calendar }
+      data: this.day
     });
   }
 

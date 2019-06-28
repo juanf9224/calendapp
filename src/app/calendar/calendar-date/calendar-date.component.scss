@@ -14,7 +14,7 @@
     }
   }
 
-  .calendar-date:nth-child(7n+7), .calendar-date:nth-child(0n+1) {
+  .calendar-date:nth-child(0), .calendar-date:nth-child(7) {
     background-color: #f1f1f1;
   }
 

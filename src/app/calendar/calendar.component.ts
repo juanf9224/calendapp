@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import * as moment from 'moment';
 import * as _ from 'lodash';
 import {select, Store} from '@ngrx/store';
@@ -10,17 +10,21 @@ import * as calendarActions from '../store/actions/calendar.actions';
 import {ReminderDialogComponent} from './reminder-dialog.component';
 import {IReminder, Reminder} from '../shared/model/reminder.model';
 import {ReminderService} from '../shared/service/reminder.service';
+import {ReplaySubject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss']
 })
-export class CalendarComponent implements OnInit {
+export class CalendarComponent implements OnInit, OnDestroy {
   currentDate = moment();
   days = moment.weekdays();
   calendar: CalendarDate[] = [];
   reminder: IReminder = new Reminder();
+  unsubscribe$: ReplaySubject<boolean> = new ReplaySubject(1);
+
   constructor(
     private store: Store<fromCalendar.CalendarState>,
     private reminderService: ReminderService,
@@ -29,7 +33,10 @@ export class CalendarComponent implements OnInit {
 
   // Load calendar dates from store if available, else generate the calendar dates
   ngOnInit() {
-    this.store.pipe(select('calendar')).subscribe((c: fromCalendar.CalendarState) => {
+    this.store.pipe(
+      takeUntil(this.unsubscribe$),
+      select('calendar')
+    ).subscribe((c: fromCalendar.CalendarState) => {
       // console.log(c);
       if (c && c.ids.length > 0) {
         const cal = [];
@@ -72,27 +79,34 @@ export class CalendarComponent implements OnInit {
 
     // After dialog closes, if reminder was created, then update calendar
     dialogRef.afterClosed()
-    .subscribe(() => {
-        const reminder = Object.assign(new Reminder(), this.reminderService.reminder);
+    .subscribe(() => this.addReminderToCalendar());
+  }
 
-        if (reminder && reminder.date) {
-          // console.log('reminder ', reminder.date);
-          const date = Object.assign({}, this.calendar
-            .find(c => c && c.date.month() === moment(reminder.date).month() && c.date.date() === moment(reminder.date).date()));
+  addReminderToCalendar(): void {
+    const reminder = Object.assign(new Reminder(), this.reminderService.reminder);
 
-          if (reminder && date && date.reminder) {
-            reminder.id = date.reminder.length;
-            date.reminder.push(reminder);
-          } else if (reminder && date) {
-            // console.log('no reminders for this date', reminder);
-            reminder.id = 0;
-            date.reminder = [reminder];
-          } else {
-            return;
-          }
-          console.log('date: ', date);
-          this.store.dispatch(calendarActions.addReminderToCalendar(date));
-        }
-    });
+    if (reminder && reminder.date) {
+      // console.log('reminder ', reminder.date);
+      const date = Object.assign({}, this.calendar
+        .find(c => c && c.date.month() === moment(reminder.date).month() && c.date.date() === moment(reminder.date).date()));
+
+      if (reminder && date && date.reminder) {
+        reminder.id = date.reminder.length;
+        date.reminder.push(reminder);
+      } else if (reminder && date) {
+        // console.log('no reminders for this date', reminder);
+        reminder.id = 0;
+        date.reminder = [reminder];
+      } else {
+        return;
+      }
+      console.log('date: ', date);
+      this.store.dispatch(calendarActions.addReminderToCalendar(date));
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next(true);
+    this.unsubscribe$.complete();
   }
 }

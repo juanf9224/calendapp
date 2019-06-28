@@ -11,8 +11,7 @@ import { IReminder } from 'src/app/shared/model/reminder.model';
   templateUrl: './reminder-form.component.html',
   styleUrls: ['./reminder-form.component.scss']
 })
-export class ReminderFormComponent implements OnInit {
-
+export class ReminderFormComponent {
   @Input()
   reminder: IReminder;
   @Input()
@@ -25,10 +24,7 @@ export class ReminderFormComponent implements OnInit {
   cities: ICity[] = [...BULK_CITIES];
   dayTime = DAY_TIME;
 
-  constructor() { }
-
-  ngOnInit() {
-  }
+  constructor() {}
 
   onAddClick() {
     console.log('before emit: ', this.reminder);
